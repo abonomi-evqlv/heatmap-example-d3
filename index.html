@@ -23,10 +23,10 @@
 
   //Read the data
   d3.csv(
-    'https://raw.githubusercontent.com/ackuser/heatmap-example-d3/master/heatmap_data.csv'
+    'https://raw.githubusercontent.com/abonomi-evqlv/heatmap-example-d3/master/heatmap_synth_data.csv'
   ).then(function (data) {
-    const myGroups = Array.from(new Set(data.map((d) => d.group)));
-    const myVars = Array.from(new Set(data.map((d) => d.variable)));
+    const myGroups = Array.from(new Set(data.map((d) => d.vh)));
+    const myVars = Array.from(new Set(data.map((d) => d.vl)));
 
     // Build X scales and axis:
     const x = d3.scaleBand().range([0, width]).domain(myGroups).padding(0.05);
@@ -51,7 +51,7 @@
     const myColor = d3
       .scaleSequential()
       .interpolator(d3.interpolateInferno)
-      .domain([1, 100]);
+      .domain([1, 1000]);
 
     // create a tooltip
     const tooltip = d3
@@ -72,7 +72,7 @@
     };
     const mousemove = function (event, d) {
       tooltip
-        .html('The exact value of<br>this cell is: ' + d.value)
+        .html(d.vl+' '+d.vh+'<br>Count: '+d.count+'<br>Relative display rate (Fab): ' + d.display_rate+'<br>Thermal stability (°C): '+d.therm_stability+'<br>pI (IgG): '+d.pI)
         .style('left', event.x / 2 + 'px')
         .style('top', event.y / 2 + 'px');
     };
@@ -85,21 +85,21 @@
     svg
       .selectAll()
       .data(data, function (d) {
-        return d.group + ':' + d.variable;
+        return d.vh + ':' + d.vl;
       })
       .join('rect')
       .attr('x', function (d) {
-        return x(d.group);
+        return x(d.vh);
       })
       .attr('y', function (d) {
-        return y(d.variable);
+        return y(d.vl);
       })
       .attr('rx', 4)
       .attr('ry', 4)
       .attr('width', x.bandwidth())
       .attr('height', y.bandwidth())
       .style('fill', function (d) {
-        return myColor(d.value);
+        return myColor(d.count);
       })
       .style('stroke-width', 4)
       .style('stroke', 'none')
